@@ -1,4 +1,4 @@
-package hurturk.emir.evaluator
+package interpreter
 
 // Todo: value type specific defaults?
 private const val DEFAULT_VAL = 0
@@ -28,6 +28,10 @@ class Environment {
         type: VariableModifier,
     ) {
         val value = initializer?.eval(this) ?: Value.IntValue(DEFAULT_VAL)
+        val variable = findVariable(name)
+        if (variable != null) {
+            throw IllegalArgumentException("Variable $name is already declared.")
+        }
         dependencyGraph[Variable(name, value, type)] = mutableListOf()
 
         if (initializer != null) {
@@ -110,4 +114,6 @@ class Environment {
         return variableExpressionMap[variable!!.name]?.eval(this)
             ?: variable!!.value
     }
+
+    fun getVariables(): List<Variable> = dependencyGraph.keys.toList()
 }

@@ -1,17 +1,25 @@
-package hurturk.emir.evaluator
+package interpreter
 
+// TODO: Implement boolean operations for BoolValue
+//       Implement String operations for StringValue
 sealed interface Value {
     data class IntValue(
         val value: Int,
-    ) : Value
+    ) : Value {
+        override fun toString(): String = "$value"
+    }
 
     data class StringValue(
         val value: String,
-    ) : Value
+    ) : Value {
+        override fun toString(): String = value
+    }
 
     data class BoolValue(
         val value: Boolean,
-    ) : Value
+    ) : Value {
+        override fun toString(): String = "$value"
+    }
 
     fun asInt(): Int =
         when (this) {

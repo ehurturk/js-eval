@@ -1,4 +1,4 @@
-package hurturk.emir.evaluator
+package interpreter
 
 enum class VariableModifier {
     MUTABLE,

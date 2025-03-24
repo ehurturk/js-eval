@@ -1,40 +1,21 @@
-import hurturk.emir.evaluator.*
+import interactive.Interactor
+import interpreter.Expression
+import interpreter.Program
+import interpreter.Statement
+import interpreter.Value
+import interpreter.VariableModifier
 
 // Usage java main [filename]
+
 fun main(args: Array<String>) {
-//    if (args.size != 2) {
-//        println("Usage:")
-//        println("main [filename]")
-//        return
-//    }
-    // let a = 1;
-    // const b = 2;
-    // let c = 3;
-    // let d = a + b;
-    // c + d
-    val program: MutableList<Statement> = mutableListOf()
-    program.add(
-        Statement.Declaration(
-            VariableModifier.MUTABLE,
-            "a",
-            Expression.Literal(Value.IntValue(1)),
-        ),
-    )
-    program.add(
-        Statement.Declaration(
-            VariableModifier.CONST,
-            "b",
-            Expression.Literal(Value.IntValue(2)),
-        ),
-    )
-    program.add(
-        Statement.Declaration(
-            VariableModifier.MUTABLE,
-            "c",
-            Expression.Literal(Value.IntValue(3)),
-        ),
-    )
-    program.add(
+    val addCD =
+        Statement.ExpressionStmt(
+            Expression.Add(
+                Expression.VariableReference("c"),
+                Expression.VariableReference("d"),
+            ),
+        )
+    val initD =
         Statement.Declaration(
             VariableModifier.MUTABLE,
             "d",
@@ -42,36 +23,44 @@ fun main(args: Array<String>) {
                 Expression.VariableReference("a"),
                 Expression.VariableReference("b"),
             ),
-        ),
-    )
-    program.add(
-        Statement.ExpressionStmt(
-            Expression.Add(
-                Expression.VariableReference("c"),
-                Expression.VariableReference("d"),
-            ),
-        ),
-    )
-    program.add(
-        Statement.ExpressionStmt(
-            Expression.Assignment(
-                "a",
-                Expression.Literal(Value.IntValue(2)),
-            ),
-        ),
-    )
-    program.add(
-        Statement.ExpressionStmt(
-            Expression.Add(
-                Expression.VariableReference("c"),
-                Expression.VariableReference("d"),
-            ),
-        ),
-    )
+            next = addCD,
+        )
+    val initBool =
+        Statement.Declaration(
+            VariableModifier.MUTABLE,
+            "ehh",
+            Expression.Literal(Value.BoolValue(true)),
+            next = initD,
+        )
+    val initC =
+        Statement.Declaration(
+            VariableModifier.MUTABLE,
+            "c",
+            Expression.Literal(Value.IntValue(3)),
+            next = initBool,
+        )
+    val initB =
+        Statement.Declaration(
+            VariableModifier.CONST,
+            "b",
+            Expression.Literal(Value.IntValue(2)),
+            next = initC,
+        )
+    val initA =
+        Statement.Declaration(
+            VariableModifier.MUTABLE,
+            "a",
+            Expression.Literal(Value.IntValue(1)),
+            next = initB,
+        )
 
-    val env = Environment()
-
-    program.forEach {
-        it.step(env)
+    val prg = Program(initA)
+    val interactive = Interactor(prg)
+    try {
+        prg.execute()
+    } catch (e: Exception) {
+        println("Error occurred:\n\t${e.message}")
+        println("No file loaded.")
     }
+    interactive.startInteractiveSession()
 }

@@ -1,4 +1,4 @@
-package hurturk.emir.evaluator
+package interpreter
 
 sealed interface Expression {
     /*

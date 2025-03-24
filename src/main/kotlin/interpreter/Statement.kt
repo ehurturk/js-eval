@@ -1,4 +1,4 @@
-package hurturk.emir.evaluator
+package interpreter
 
 /*
  * Each JS line can be categorized as 2 statements:
@@ -36,30 +36,44 @@ package hurturk.emir.evaluator
  */
 
 sealed interface Statement {
+    var next: Statement?
+    val lastInSequence: Statement
+        get() {
+            if (next == null) return this
+            return next!!.lastInSequence
+        }
+
     data class Declaration(
         val type: VariableModifier,
         val name: String,
         val initializer: Expression?,
+        override var next: Statement? = null,
     ) : Statement
 
     data class ExpressionStmt(
         val expr: Expression,
+        override var next: Statement? = null,
     ) : Statement
 
     data class FunctionDeclaration(
         val name: String,
         val args: List<String>,
         val body: List<Statement>,
+        override var next: Statement? = null,
     ) : Statement
 }
 
-fun Statement.step(env: Environment) {
+// Executes the current statement and returns the next
+fun Statement.step(env: Environment): Statement? =
     when (this) {
-        is Statement.Declaration -> env.declareVariable(name, initializer, type)
+        // For simple one-line operations like declaration and expressions, simply returning the next will be enough.
+        is Statement.Declaration -> {
+            env.declareVariable(name, initializer, type)
+            next
+        }
         is Statement.ExpressionStmt -> {
-            val value = expr.eval(env)
-            println("Out: $value")
+            expr.eval(env)
+            next
         }
         is Statement.FunctionDeclaration -> TODO()
     }
-}
