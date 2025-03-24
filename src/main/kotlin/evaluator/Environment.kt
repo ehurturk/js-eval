@@ -1,4 +1,4 @@
-package evaluator
+package hurturk.emir.evaluator
 
 // Todo: value type specific defaults?
 private const val DEFAULT_VAL = 0

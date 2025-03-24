@@ -1,4 +1,4 @@
-import evaluator.*
+import hurturk.emir.evaluator.*
 
 // Usage java main [filename]
 fun main(args: Array<String>) {

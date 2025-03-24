@@ -1,4 +1,4 @@
-package evaluator
+package hurturk.emir.evaluator
 
 /*
  * Each JS line can be categorized as 2 statements:

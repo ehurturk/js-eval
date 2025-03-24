@@ -1,4 +1,4 @@
-package evaluator
+package hurturk.emir.evaluator
 
 sealed interface Value {
     data class IntValue(

@@ -1,4 +1,4 @@
-package evaluator
+package hurturk.emir.evaluator
 
 class UndefinedBehaviourException(
     private val msg: String,
