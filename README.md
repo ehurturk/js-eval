@@ -45,8 +45,16 @@ Tests are contained in `src/test/` directory. The tests are:
 - `ParseTests.kt`
   - Tests core parsing functionality
 
+## Commands
+You can use the following commands in the interactive session:
+- `info`: displays information about all the variables, their modifier types, and their values.
+- `assign [varname] [varvalue]`:
+  - assigns a variable to a value (NOTE: the variable should be declared first)
+  - `varvalue` can also be an expression (e.g. `assign a c+4`)
+- `evalLine [lineno]`: evaluates the given line number and returns the result if it is an expression
+- `[funcname]([args])`: invokes a function with the given arguments
+
 ## TODO
-- Parse program string into AST
 - Parse requests into Statements
 - Implement `evalLine()` and `invokeFunction()` in program
 - Parse assign request expressions:
@@ -70,5 +78,7 @@ Tests are contained in `src/test/` directory. The tests are:
     ```
 
 ## Errors:
+- check syntax errors:
+  - `let a = c = 3` should produce a syntax error.
 - assign request of not previously declared variable:
   - should I produce an error OR should I declare it as a new variable? (currently producing an error)

@@ -19,7 +19,7 @@ sealed interface Request {
 }
 
 class Program(
-    private val topLevelStatement: Statement,
+    private val topLevelStatement: Statement?,
 ) {
     val env = Environment()
 
