@@ -1,5 +1,8 @@
 package interpreter
 
+import interactive.red
+import interactive.yellow
+
 sealed interface Request {
     data class EvalLine(
         val lineNumber: Int,
@@ -16,18 +19,19 @@ sealed interface Request {
     ) : Request
 
     data object PrintInfo : Request
+
+    data object PrintHelp : Request
 }
 
 class Program(
-    private val topLevelStatement: Statement?,
+    private val stmts: List<Statement>,
 ) {
     val env = Environment()
 
     // For executing the file
     fun execute() {
-        var stmt: Statement? = topLevelStatement
-        while (stmt != null) {
-            stmt = stmt.step(env)
+        stmts.forEach {
+            it.step(env)
         }
     }
 
@@ -69,13 +73,20 @@ class Program(
             is Expression.FuncExpr -> "function(${expr.args.joinToString(", ")}) { /* ... */ }"
         }
 
-    fun evalLine(lineNumber: Int): Value = Value.IntValue(2)
+    fun evalLine(lineNumber: Int): Value {
+        if (lineNumber < 1 || lineNumber > stmts.size) {
+            return Value.StringValue("Line number is out of range.".red())
+        }
+        val stmt = stmts[lineNumber - 1]
+        return stmt.step(env)
+    }
 
     fun assignVariable(
         varName: String,
         expr: Expression,
     ): Value {
         env.assignVariable(varName, expr)
+        // if it doesn't throw any exception:
         return Value.StringValue("ok")
     }
 
@@ -99,6 +110,11 @@ class Program(
             }
 
             Request.PrintInfo -> Value.StringValue(toString())
+            Request.PrintHelp ->
+                Value.StringValue(
+                    "Commands:\n\tevalLine [lineno]: Evaluates the statement at line number\n\tassign [varname] [varvalue]: Assigns the value to the variable name\n\tinfo: Displays current information about variables\n\thelp: Displays a help message"
+                        .yellow(),
+                )
         }
 
     override fun toString(): String {

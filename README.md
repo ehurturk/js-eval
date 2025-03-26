@@ -55,22 +55,19 @@ You can use the following commands in the interactive session:
 - `[funcname]([args])`: invokes a function with the given arguments
 
 ## TODO
-- Parse requests into Statements
-- Implement `evalLine()` and `invokeFunction()` in program
-- Parse assign request expressions:
-  - "support expressions as VAL in an assign request."
+- Implement`invokeFunction()` in program
 - Function declaration implementation
-  - ```js
-    function double(x) {
-        return 2*x;
-    }
-    ```
+  ```js
+  function double(x) {
+      return 2*x;
+  }
+  ```
 - Anonymous function expression (as arrow functions) implementation
-  - ```js
+  ```js
     const b = (c,d) => { ... }
     ```
 - Implement support for ES named imports:
-  - ```js
+  ```js
     import { foo, bar } from "/modules/my-module.js";
     let x = 1 + foo;
     let y = 2 * bar;
@@ -78,7 +75,8 @@ You can use the following commands in the interactive session:
     ```
 
 ## Errors:
-- check syntax errors:
+- circular dependencies in expression evaluation!!!!!!!!!
+- ~~check syntax errors:~~
   - `let a = c = 3` should produce a syntax error.
 - assign request of not previously declared variable:
   - should I produce an error OR should I declare it as a new variable? (currently producing an error)

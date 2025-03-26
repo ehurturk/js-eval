@@ -9,19 +9,21 @@ import parser.ParserException
 fun main(args: Array<String>) {
     val source =
         """
-        const a = 14;
-        let b = 15;
-        
-        b = b + a;   
+        let a = 1;
+        const b = 2;
+        let c = 3;
+        let d = (a + b);
+        c + d;
         """.trimIndent()
 
     val parser = Parser(source)
 
-    var parsed: Statement? = null
+    var parsed: List<Statement> = emptyList()
     try {
         parsed = parser.parse()
     } catch (e: ParserException) {
         println(e.message)
+        println("No file loaded.")
     }
 
     val prg = Program(parsed)

@@ -1,9 +1,8 @@
 package interactive
 
-import interpreter.Expression
-import interpreter.Program
-import interpreter.Request
-import interpreter.Value
+import interpreter.*
+import parser.Parser
+import parser.ParserException
 
 class Interactor(
     private val program: Program,
@@ -46,8 +45,20 @@ class Interactor(
                 //                          Expression.VariableReference("b"),
                 //                          Expression.Literal(Value.IntValue(3))
                 //                        )
-                val valueExpr = parseLiteral(parts[2])
-                Request.AssignVar(name, valueExpr)
+                val parser = Parser(parts[2])
+                try {
+                    // Try to parse the expression in the assign request using the parser
+                    val stmt = parser.parse().firstOrNull() ?: return null
+                    val expr =
+                        when (stmt) {
+                            is Statement.ExpressionStmt -> stmt.expr
+                            else -> return null
+                        }
+                    Request.AssignVar(name, expr)
+                } catch (e: ParserException) {
+                    println("Error parsing expression: ${e.message}")
+                    return null
+                }
             }
 
             parts[0] == "invoke" && parts.size >= 2 -> {
@@ -56,17 +67,12 @@ class Interactor(
                 Request.InvokeFunction(name, args)
             }
 
+            parts[0] == "help" -> Request.PrintHelp
+
             parts[0] == "info" -> Request.PrintInfo
             else -> null
         }
     }
-
-    private fun parseLiteral(value: String): Expression =
-        when {
-            value.toIntOrNull() != null -> Expression.Literal(Value.IntValue(value.toInt()))
-            value == "true" || value == "false" -> Expression.Literal(Value.BoolValue(value.toBoolean()))
-            else -> Expression.VariableReference(value)
-        }
 
     private fun executeCommand(request: Request): Value = program.executeRequest(request)
 }

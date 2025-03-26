@@ -13,7 +13,7 @@ class Parser(
 ) {
     private val tokenizer = Tokenizer(sourceCode)
 
-    fun parse(): Statement? {
+    fun parse(): List<Statement> {
         val statements = mutableListOf<Statement>()
 
         while (tokenizer.hasMore()) {
@@ -21,13 +21,8 @@ class Parser(
             statements.add(statement)
         }
 
-        if (statements.isEmpty()) return null
-
-        for (i in 0 until statements.size - 1) {
-            statements[i].next = statements[i + 1]
-        }
-
-        return statements.firstOrNull()
+        if (statements.isEmpty()) return emptyList()
+        return statements
     }
 
     private fun parseStatement(): Statement? {
@@ -234,6 +229,8 @@ class Parser(
             if (!tokenizer.match(")")) throw ParserException("Expected ')' after an opening '('", sourceCode, tokenizer.position)
             return expr
         }
+
+        if (tokenizer.match(")")) throw ParserException("Can't match the opening of ')'", sourceCode, tokenizer.position)
 
         return null
     }
