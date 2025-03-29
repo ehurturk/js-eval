@@ -37,9 +37,7 @@ package interpreter
 
 sealed interface Statement {
     data class Declaration(
-        val type: VariableModifier,
-        val name: String,
-        val initializer: Expression?,
+        val variable: Symbol.Variable,
     ) : Statement
 
     data class ExpressionStmt(
@@ -47,7 +45,7 @@ sealed interface Statement {
     ) : Statement
 
     data class FunctionDeclaration(
-        val function: Function,
+        val function: Symbol.Function,
     ) : Statement
 
     data class ReturnStmt(
@@ -59,8 +57,8 @@ sealed interface Statement {
 fun Statement.step(env: Environment): Value {
     when (this) {
         is Statement.Declaration -> {
-            env.declareVariable(name, initializer, type)
-            return Value.StringValue("Declared variable $name")
+            env.declareVariable(variable.name, variable.expression, variable.type)
+            return Value.StringValue("Declared variable ${variable.name}")
         }
 
         is Statement.ExpressionStmt -> {
@@ -68,8 +66,8 @@ fun Statement.step(env: Environment): Value {
         }
 
         is Statement.FunctionDeclaration -> {
-//            env.declareFunction(function.name, function.args, function.body)
-            TODO()
+            env.declareFunction(function.name, function.args, function.body)
+            return Value.StringValue("Declared function ${function.name}")
         }
 
         is Statement.ReturnStmt -> TODO()

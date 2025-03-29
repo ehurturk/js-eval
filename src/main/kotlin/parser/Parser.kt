@@ -2,6 +2,7 @@ package parser
 
 import interpreter.Expression
 import interpreter.Statement
+import interpreter.Symbol
 import interpreter.Value
 import interpreter.VariableModifier
 
@@ -28,6 +29,10 @@ class Parser(
     private fun parseStatement(): Statement? {
         tokenizer.skipWhitespace()
         // TODO: refactor this let and const into a single if?
+        if (tokenizer.match("function")) {
+            return parseFunctionDeclaration()
+        }
+
         if (tokenizer.match("let")) {
             tokenizer.skipWhitespace()
             val name = tokenizer.identifier() ?: return null
@@ -42,9 +47,12 @@ class Parser(
             if (initializer is Expression.Assignment) throw ParserException("Expected expression after '='", sourceCode, tokenizer.position)
 
             return Statement.Declaration(
-                VariableModifier.MUTABLE,
-                name,
-                initializer,
+                Symbol.Variable(
+                    name,
+                    value = null,
+                    VariableModifier.MUTABLE,
+                    initializer,
+                ),
             )
         }
 
@@ -62,9 +70,12 @@ class Parser(
             if (initializer is Expression.Assignment) throw ParserException("Expected expression after '='", sourceCode, tokenizer.position)
 
             return Statement.Declaration(
-                VariableModifier.CONST,
-                name,
-                initializer,
+                Symbol.Variable(
+                    name,
+                    value = null,
+                    VariableModifier.MUTABLE,
+                    initializer,
+                ),
             )
         }
 
@@ -74,6 +85,94 @@ class Parser(
         tokenizer.match(";")
 
         return Statement.ExpressionStmt(expr)
+    }
+
+    private fun parseFunctionDeclaration(): Statement? {
+        tokenizer.skipWhitespace()
+
+        val name =
+            tokenizer.identifier()
+                ?: throw ParserException("Expected function name", sourceCode, tokenizer.position)
+
+        tokenizer.skipWhitespace()
+
+        if (!tokenizer.match("(")) {
+            throw ParserException("Expected '(' after function name", sourceCode, tokenizer.position)
+        }
+
+        val parameters = parseParameterList()
+
+        if (!tokenizer.match(")")) {
+            throw ParserException("Expected ')' after parameter list", sourceCode, tokenizer.position)
+        }
+
+        tokenizer.skipWhitespace()
+
+        if (!tokenizer.match("{")) {
+            throw ParserException("Expected '{' to begin function body", sourceCode, tokenizer.position)
+        }
+
+        val body = parseFunctionBody()
+
+        if (!tokenizer.match("}")) {
+            throw ParserException("Expected '}' to end function body", sourceCode, tokenizer.position)
+        }
+
+        return Statement.FunctionDeclaration(
+            Symbol.Function(
+                name,
+                parameters,
+                body,
+            ),
+        )
+    }
+
+    private fun parseParameterList(): List<String> {
+        val parameters = mutableListOf<String>()
+
+        tokenizer.skipWhitespace()
+        if (tokenizer.peek() == ')') {
+            // Empty parameter list
+            return parameters
+        }
+
+        while (true) {
+            tokenizer.skipWhitespace()
+
+            val parameter =
+                tokenizer.identifier()
+                    ?: throw ParserException("Expected parameter name", sourceCode, tokenizer.position)
+
+            parameters.add(parameter)
+
+            tokenizer.skipWhitespace()
+            if (!tokenizer.match(",")) {
+                break
+            }
+        }
+
+        return parameters
+    }
+
+    private fun parseFunctionBody(): List<Statement> {
+        val statements = mutableListOf<Statement>()
+
+        while (tokenizer.hasMore()) {
+            tokenizer.skipWhitespace()
+
+            // Check for end of function body
+            if (tokenizer.peek() == '}') {
+                break
+            }
+
+            val statement =
+                parseStatement()
+                    ?: throw ParserException("Expected statement in function body", sourceCode, tokenizer.position)
+
+            statements.add(statement)
+        }
+
+        return statements
     }
 
     /*

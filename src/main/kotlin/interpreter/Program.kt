@@ -39,14 +39,14 @@ class Program(
         when (stmt) {
             is Statement.Declaration -> {
                 val modifier =
-                    when (stmt.type) {
+                    when (stmt.variable.type) {
                         VariableModifier.MUTABLE -> "let"
                         VariableModifier.CONST -> "const"
                     }
-                if (stmt.initializer != null) {
-                    "$modifier ${stmt.name} = ${formatExpression(stmt.initializer)}"
+                if (stmt.variable.expression != null) {
+                    "$modifier ${stmt.variable.name} = ${formatExpression(stmt.variable.expression)}"
                 } else {
-                    "$modifier ${stmt.name}"
+                    "$modifier ${stmt.variable.name}"
                 }
             }
             is Statement.ExpressionStmt -> formatExpression(stmt.expr)
@@ -121,15 +121,15 @@ class Program(
         }
 
     override fun toString(): String {
-        val variables = env.getVariables()
-        if (variables.isEmpty()) return "No variables defined"
+        val symbols = env.getSymbols()
+        if (symbols.isEmpty()) return "No symbols defined"
 
         // Find the longest variable name for alignment
-        val maxNameLength = variables.maxOf { it.name.length }
-        val maxTypeLength = variables.maxOf { it.type.toString().length }
+        val maxNameLength = symbols.maxOf { it.name.length }
+        val maxTypeLength = symbols.maxOf { if (it is Symbol.Variable) it.type.toString().length else "Function".length }
 
         // Create headers
-        val headerName = "VARIABLE".padEnd(maxNameLength)
+        val headerName = "SYMBOL".padEnd(maxNameLength)
         val headerType = "TYPE".padEnd(maxTypeLength)
         val header = "$headerName | $headerType | VALUE"
         val separator = "-".repeat(header.length)
@@ -138,11 +138,17 @@ class Program(
         sb.appendLine(header)
         sb.appendLine(separator)
 
-        for (v in variables) {
+        for (v in symbols) {
             val name = v.name.padEnd(maxNameLength)
-            val type = v.type.toString().padEnd(maxTypeLength)
-            val value = env.getVariable(v.name).toString()
-            sb.appendLine("$name | $type | $value")
+            if (v is Symbol.Variable) {
+                val type = v.type.toString().padEnd(maxTypeLength)
+                val value = env.getVariable(v.name).toString()
+                sb.appendLine("$name | $type | $value")
+                continue
+            }
+            if (v is Symbol.Function) {
+                sb.appendLine("$name | CONST | - ")
+            }
         }
 
         return sb.toString()

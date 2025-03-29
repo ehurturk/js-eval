@@ -10,7 +10,7 @@ class Environment {
     // let a = 4;
     // let b = 3;
     // let d = a + 2;
-    private val variableExpressionMap: MutableMap<Variable, Expression?> = mutableMapOf()
+    private val symbolTable: MutableMap<String, Symbol> = mutableMapOf()
 
     // for first declarations
     fun declareVariable(
@@ -18,49 +18,63 @@ class Environment {
         initializer: Expression?,
         type: VariableModifier,
     ) {
-        val variable = findVariable(name)
-        if (variable != null) {
-            throw IllegalArgumentException("Variable $name is already declared.")
-        }
-
+        if (symbolTable.containsKey(name)) throw IllegalArgumentException("Symbol $name is already declared")
         val value = initializer?.eval(this) ?: Value.IntValue(DEFAULT_VAL)
-        variableExpressionMap[Variable(name, value, type)] = initializer
+        symbolTable[name] = Symbol.Variable(name, value, type, initializer)
     }
 
+    //  TODO: Change params to list of expressions
     fun declareFunction(
         name: String,
-        args: List<Expression>,
+        parameters: List<String>,
         body: List<Statement>,
     ) {
-    }
-
-    private fun findVariable(name: String): Variable? {
-        var variable: Variable? = null
-        variableExpressionMap.forEach {
-            if (it.key.name == name) variable = it.key
+        if (symbolTable.containsKey(name)) {
+            throw IllegalArgumentException("Symbol $name is already declared.")
         }
-        return variable
+
+        symbolTable[name] = Symbol.Function(name, parameters, body)
     }
 
     fun assignVariable(
         name: String,
         expr: Expression,
     ) {
-        val value = expr.eval(this)
-        val variable: Variable = findVariable(name) ?: throw IllegalArgumentException("Variable $name isn't defined.")
-        if (variable.type == VariableModifier.CONST) {
+        val symbol = symbolTable[name] ?: throw IllegalArgumentException("Symbol $name isn't defined.")
+
+        if (symbol !is Symbol.Variable) {
+            throw IllegalArgumentException("$name is not a variable")
+        }
+
+        if (symbol.type == VariableModifier.CONST) {
             throw UndefinedBehaviourException("Can't reassign a const variable.")
         }
-        val newVariable = Variable(name, value, variable.type)
-        variableExpressionMap.remove(variable)
-        variableExpressionMap[newVariable] = expr
+
+        val value = expr.eval(this)
+        symbolTable[name] = Symbol.Variable(name, value, symbol.type, expr)
     }
 
     fun getVariable(name: String): Value {
-        val variable: Variable = findVariable(name) ?: throw IllegalArgumentException("Variable $name isn't defined")
-        // return the reevaluated expression if it has an associated expression, otherwise return its normal value.
-        return variableExpressionMap[variable]?.eval(this) ?: variable.value
+        val symbol = symbolTable[name] ?: throw IllegalArgumentException("Symbol $name is not defined")
+
+        if (symbol !is Symbol.Variable) {
+            throw IllegalArgumentException("$name is not a variable")
+        }
+
+        // Return the reevaluated expression if available, otherwise the stored value
+        return symbol.expression?.eval(this) ?: (symbol.value ?: Value.IntValue(DEFAULT_VAL))
     }
 
-    fun getVariables(): List<Variable> = variableExpressionMap.keys.toList()
+    fun getFunction(name: String): Symbol.Function {
+        val symbol = symbolTable[name] ?: throw IllegalArgumentException("Symbol $name is not defined")
+
+        return when (symbol) {
+            is Symbol.Function -> symbol
+            else -> throw IllegalArgumentException("$name is not a function")
+        }
+    }
+
+    fun getSymbols(): List<Symbol> = symbolTable.values.toList()
+
+//    fun getVariables(): List<Symbol.Variable> = variableExpressionMap.keys.toList()
 }
