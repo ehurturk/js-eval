@@ -51,8 +51,10 @@ class Program(
             }
             is Statement.ExpressionStmt -> formatExpression(stmt.expr)
             is Statement.FunctionDeclaration -> {
-                "function ${stmt.name}(${stmt.args.joinToString(", ")}) { /* ... */ }"
+                "function ${stmt.function.name}(${stmt.function.args.joinToString(", ")}) { /* ... */ }"
             }
+
+            is Statement.ReturnStmt -> TODO()
         }
 
     private fun formatExpression(expr: Expression): String =
@@ -71,6 +73,7 @@ class Program(
             is Expression.Mul -> "${formatExpression(expr.lhs)} * ${formatExpression(expr.rhs)}"
             is Expression.Div -> "${formatExpression(expr.lhs)} / ${formatExpression(expr.rhs)}"
             is Expression.FuncExpr -> "function(${expr.args.joinToString(", ")}) { /* ... */ }"
+            is Expression.FunctionCall -> "${expr.name}(${expr.args.joinToString(", ")}})"
         }
 
     fun evalLine(lineNumber: Int): Value {

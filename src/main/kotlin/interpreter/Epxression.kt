@@ -22,6 +22,11 @@ sealed interface Expression {
         val value: Expression,
     ) : Expression
 
+    data class FunctionCall(
+        val name: String,
+        val args: List<Expression>,
+    ) : Expression
+
     data class FuncExpr(
         val args: List<String>,
     ) : Expression
@@ -58,8 +63,12 @@ fun Expression.eval(env: Environment): Value =
         }
         is Expression.VariableReference -> env.getVariable(name)
         is Expression.Literal -> value
+
+        // Function related evals
+        is Expression.FunctionCall -> TODO()
         is Expression.FuncExpr -> TODO()
 
+        //  Operation related evals
         is Expression.Add -> lhs.eval(env).add(rhs.eval(env))
         is Expression.Div -> lhs.eval(env).div(rhs.eval(env))
         is Expression.Mul -> lhs.eval(env).mul(rhs.eval(env))

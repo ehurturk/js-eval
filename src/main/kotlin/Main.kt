@@ -11,8 +11,8 @@ fun main(args: Array<String>) {
         """
         let a = 1;
         const b = 2;
-        let c = 3;
-        let d = (a + b);
+        let c = a + b;
+        let d = c + a;
         c + d;
         """.trimIndent()
 

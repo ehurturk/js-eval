@@ -37,10 +37,9 @@ class Interactor(
 
             parts[0] == "assign" && parts.size >= 3 -> {
                 val name = parts[1]
-                // TODO: Parse the expression of assign
-                //       i.e. when the request is as:
-                //       assign a b+3
-                //       parse b+3 into Expression.Add
+                //  Parse the expression of assign, i.e. when the request is as:
+                //    assign a b+3
+                //    parse b+3 into Expression.Add
                 //                        (
                 //                          Expression.VariableReference("b"),
                 //                          Expression.Literal(Value.IntValue(3))

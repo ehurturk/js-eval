@@ -47,9 +47,11 @@ sealed interface Statement {
     ) : Statement
 
     data class FunctionDeclaration(
-        val name: String,
-        val args: List<String>,
-        val body: List<Statement>,
+        val function: Function,
+    ) : Statement
+
+    data class ReturnStmt(
+        val value: Expression?,
     ) : Statement
 }
 
@@ -65,6 +67,11 @@ fun Statement.step(env: Environment): Value {
             return expr.eval(env)
         }
 
-        is Statement.FunctionDeclaration -> TODO()
+        is Statement.FunctionDeclaration -> {
+//            env.declareFunction(function.name, function.args, function.body)
+            TODO()
+        }
+
+        is Statement.ReturnStmt -> TODO()
     }
 }
