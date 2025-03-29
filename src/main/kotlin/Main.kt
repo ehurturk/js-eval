@@ -13,6 +13,11 @@ fun main(args: Array<String>) {
         const b = 2;
         let c = a + b;
         let d = c + a;
+        function test(a, b, c) {
+            let d = 12;
+            return 12;
+            let c = 13;
+        }
         c + d;
         """.trimIndent()
 

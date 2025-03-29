@@ -76,15 +76,16 @@ class Program(
             is Expression.FunctionCall -> "${expr.name}(${expr.args.joinToString(", ")}})"
         }
 
-    fun evalLine(lineNumber: Int): Value {
+    private fun evalLine(lineNumber: Int): Value {
         if (lineNumber < 1 || lineNumber > stmts.size) {
             return Value.StringValue("Line number is out of range.".red())
         }
+        // TODO: Execute actual line numbers instead of statement elements
         val stmt = stmts[lineNumber - 1]
         return stmt.step(env)
     }
 
-    fun assignVariable(
+    private fun assignVariable(
         varName: String,
         expr: Expression,
     ): Value {
@@ -126,7 +127,7 @@ class Program(
 
         // Find the longest variable name for alignment
         val maxNameLength = symbols.maxOf { it.name.length }
-        val maxTypeLength = symbols.maxOf { if (it is Symbol.Variable) it.type.toString().length else "Function".length }
+        val maxTypeLength = symbols.maxOf { if (it is Symbol.Variable) it.type.toString().length else "FUNCTION".length }
 
         // Create headers
         val headerName = "SYMBOL".padEnd(maxNameLength)
@@ -147,7 +148,7 @@ class Program(
                 continue
             }
             if (v is Symbol.Function) {
-                sb.appendLine("$name | CONST | - ")
+                sb.appendLine("$name | FUNCTION | - ")
             }
         }
 

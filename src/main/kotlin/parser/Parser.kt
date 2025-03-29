@@ -73,7 +73,7 @@ class Parser(
                 Symbol.Variable(
                     name,
                     value = null,
-                    VariableModifier.MUTABLE,
+                    VariableModifier.CONST,
                     initializer,
                 ),
             )
@@ -87,36 +87,26 @@ class Parser(
         return Statement.ExpressionStmt(expr)
     }
 
-    private fun parseFunctionDeclaration(): Statement? {
+    private fun parseFunctionDeclaration(): Statement {
         tokenizer.skipWhitespace()
 
-        val name =
-            tokenizer.identifier()
-                ?: throw ParserException("Expected function name", sourceCode, tokenizer.position)
+        val name = tokenizer.identifier() ?: throw ParserException("Expected function name", sourceCode, tokenizer.position)
 
         tokenizer.skipWhitespace()
 
-        if (!tokenizer.match("(")) {
-            throw ParserException("Expected '(' after function name", sourceCode, tokenizer.position)
-        }
+        if (!tokenizer.match("(")) throw ParserException("Expected '(' after function name", sourceCode, tokenizer.position)
 
         val parameters = parseParameterList()
 
-        if (!tokenizer.match(")")) {
-            throw ParserException("Expected ')' after parameter list", sourceCode, tokenizer.position)
-        }
+        if (!tokenizer.match(")")) throw ParserException("Expected ')' after parameter list", sourceCode, tokenizer.position)
 
         tokenizer.skipWhitespace()
 
-        if (!tokenizer.match("{")) {
-            throw ParserException("Expected '{' to begin function body", sourceCode, tokenizer.position)
-        }
+        if (!tokenizer.match("{")) throw ParserException("Expected '{' to begin function body", sourceCode, tokenizer.position)
 
         val body = parseFunctionBody()
 
-        if (!tokenizer.match("}")) {
-            throw ParserException("Expected '}' to end function body", sourceCode, tokenizer.position)
-        }
+        if (!tokenizer.match("}")) throw ParserException("Expected '}' to end function body", sourceCode, tokenizer.position)
 
         return Statement.FunctionDeclaration(
             Symbol.Function(
@@ -160,18 +150,23 @@ class Parser(
         while (tokenizer.hasMore()) {
             tokenizer.skipWhitespace()
 
-            // Check for end of function body
+            // check return statement
+            if (tokenizer.match("return")) {
+                tokenizer.skipWhitespace()
+                val expression = parseExpression()
+                statements.add(Statement.ReturnStmt(expression))
+                tokenizer.skipWhitespace()
+                tokenizer.match(";")
+                tokenizer.skipWhitespace()
+            }
+
             if (tokenizer.peek() == '}') {
                 break
             }
 
-            val statement =
-                parseStatement()
-                    ?: throw ParserException("Expected statement in function body", sourceCode, tokenizer.position)
-
+            val statement = parseStatement() ?: throw ParserException("Expected statement in function body", sourceCode, tokenizer.position)
             statements.add(statement)
         }
-
         return statements
     }
 

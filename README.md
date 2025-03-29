@@ -75,8 +75,9 @@ You can use the following commands in the interactive session:
     ```
 
 ## Errors:
-- circular dependencies in expression evaluation!!!!!!!!!
-- ~~check syntax errors:~~
+- `evalLine`: should return line number like files (including newlines etc.)
+- check syntax errors:
+  - `let a = d; \fjdf` should produce a syntax error but currently the parser ignores it 
   - `let a = c = 3` should produce a syntax error.
 - assign request of not previously declared variable:
   - should I produce an error OR should I declare it as a new variable? (currently producing an error)
