@@ -31,37 +31,45 @@ class EvalTests {
             )
         val initD =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "d",
-                Expression.Add(
-                    Expression.VariableReference("a"),
-                    Expression.VariableReference("b"),
+                Symbol.Variable(
+                    "d",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Add(
+                        Expression.VariableReference("a"),
+                        Expression.VariableReference("b"),
+                    ),
                 ),
-                next = addCD,
             )
         val initC =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "c",
-                Expression.Literal(Value.IntValue(3)),
-                next = initD,
+                Symbol.Variable(
+                    "c",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Literal(Value.IntValue(3)),
+                ),
             )
         val initB =
             Statement.Declaration(
-                VariableModifier.CONST,
-                "b",
-                Expression.Literal(Value.IntValue(2)),
-                next = initC,
+                Symbol.Variable(
+                    "b",
+                    null,
+                    VariableModifier.CONST,
+                    Expression.Literal(Value.IntValue(2)),
+                ),
             )
         val initA =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "a",
-                Expression.Literal(Value.IntValue(1)),
-                next = initB,
+                Symbol.Variable(
+                    "a",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Literal(Value.IntValue(1)),
+                ),
             )
 
-        val prg = Program(initA)
+        val prg = Program(listOf(initA, initB, initC, initD, addCD))
         prg.execute()
 
         assertEquals(3, prg.env.getVariable("d").asInt())
@@ -99,37 +107,45 @@ class EvalTests {
             )
         val initD =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "d",
-                Expression.Add(
-                    Expression.VariableReference("a"),
-                    Expression.VariableReference("b"),
+                Symbol.Variable(
+                    "d",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Add(
+                        Expression.VariableReference("a"),
+                        Expression.VariableReference("b"),
+                    ),
                 ),
-                next = changeB,
             )
         val initC =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "c",
-                Expression.Literal(Value.IntValue(3)),
-                next = initD,
+                Symbol.Variable(
+                    "c",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Literal(Value.IntValue(3)),
+                ),
             )
         val initB =
             Statement.Declaration(
-                VariableModifier.CONST,
-                "b",
-                Expression.Literal(Value.IntValue(2)),
-                next = initC,
+                Symbol.Variable(
+                    "b",
+                    null,
+                    VariableModifier.CONST,
+                    Expression.Literal(Value.IntValue(2)),
+                ),
             )
         val initA =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "a",
-                Expression.Literal(Value.IntValue(1)),
-                next = initB,
+                Symbol.Variable(
+                    "a",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Literal(Value.IntValue(1)),
+                ),
             )
 
-        val prg = Program(initA)
+        val prg = Program(listOf(initA, initB, initC, initD, changeB))
 
         assertFailsWith<UndefinedBehaviourException> {
             prg.execute()
@@ -162,37 +178,45 @@ class EvalTests {
             )
         val initD =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "d",
-                Expression.Add(
-                    Expression.VariableReference("a"),
-                    Expression.VariableReference("b"),
+                Symbol.Variable(
+                    "d",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Add(
+                        Expression.VariableReference("a"),
+                        Expression.VariableReference("b"),
+                    ),
                 ),
-                next = addCD,
             )
         val initC =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "c",
-                Expression.Literal(Value.IntValue(3)),
-                next = initD,
+                Symbol.Variable(
+                    "c",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Literal(Value.IntValue(3)),
+                ),
             )
         val initB =
             Statement.Declaration(
-                VariableModifier.CONST,
-                "b",
-                Expression.Literal(Value.IntValue(2)),
-                next = initC,
+                Symbol.Variable(
+                    "b",
+                    null,
+                    VariableModifier.CONST,
+                    Expression.Literal(Value.IntValue(2)),
+                ),
             )
         val initA =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "a",
-                Expression.Literal(Value.IntValue(1)),
-                next = initB,
+                Symbol.Variable(
+                    "a",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Literal(Value.IntValue(1)),
+                ),
             )
 
-        val prg = Program(initA)
+        val prg = Program(listOf(initA, initB, initC, initD, addCD))
         prg.execute()
 
         assertEquals(3, prg.env.getVariable("d").asInt())
@@ -200,34 +224,88 @@ class EvalTests {
         assertEquals(2, prg.env.getVariable("b").asInt())
         assertEquals(3, prg.env.getVariable("c").asInt())
 
-        val res = prg.executeRequest(Request.AssignVar("b", Expression.Literal(Value.IntValue(10))))
-        assertEquals("Fail", res.asString().substring(0, 4))
+        assertFailsWith<UndefinedBehaviourException> { prg.executeRequest(Request.AssignVar("b", Expression.Literal(Value.IntValue(10)))) }
     }
 
     @Test
     fun `can't have variables with the same name`() {
         val initC =
             Statement.Declaration(
-                VariableModifier.CONST,
-                "a",
-                Expression.Literal(Value.IntValue(-1000)),
+                Symbol.Variable(
+                    "a",
+                    null,
+                    VariableModifier.CONST,
+                    Expression.Literal(Value.IntValue(-1000)),
+                ),
             )
         val initB =
             Statement.Declaration(
-                VariableModifier.CONST,
-                "b",
-                Expression.Literal(Value.IntValue(2)),
-                next = initC,
+                Symbol.Variable(
+                    "b",
+                    null,
+                    VariableModifier.CONST,
+                    Expression.Literal(Value.IntValue(2)),
+                ),
             )
         val initA =
             Statement.Declaration(
-                VariableModifier.MUTABLE,
-                "a",
-                Expression.Literal(Value.IntValue(1)),
-                next = initB,
+                Symbol.Variable(
+                    "a",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.Literal(Value.IntValue(1)),
+                ),
             )
 
-        val prg = Program(initA)
+        val prg = Program(listOf(initA, initB, initC))
         assertFailsWith<IllegalArgumentException> { prg.execute() }
+    }
+
+    // New test for function declaration and call
+    @Test
+    fun `function declaration and call`() {
+        // function add(a, b) { return a + b; }
+        // let result = add(5, 7);
+        // result should be 12
+
+        val functionBody =
+            listOf(
+                Statement.ReturnStmt(
+                    Expression.Add(
+                        Expression.VariableReference("a"),
+                        Expression.VariableReference("b"),
+                    ),
+                ),
+            )
+
+        val addFunction =
+            Statement.FunctionDeclaration(
+                Symbol.Function(
+                    "add",
+                    listOf("a", "b"),
+                    functionBody,
+                ),
+            )
+
+        val resultDecl =
+            Statement.Declaration(
+                Symbol.Variable(
+                    "result",
+                    null,
+                    VariableModifier.MUTABLE,
+                    Expression.FunctionCall(
+                        "add",
+                        listOf(
+                            Expression.Literal(Value.IntValue(5)),
+                            Expression.Literal(Value.IntValue(7)),
+                        ),
+                    ),
+                ),
+            )
+
+        val prg = Program(listOf(addFunction, resultDecl))
+        prg.execute()
+
+        assertEquals(12, prg.env.getVariable("result").asInt())
     }
 }

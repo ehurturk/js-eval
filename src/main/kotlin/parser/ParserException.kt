@@ -1,10 +1,5 @@
 package parser
 
-import interactive.blue
-import interactive.red
-import interactive.redBold
-import interactive.yellow
-
 fun prettyPrintParseError(
     source: String,
     errorOffset: Int,
@@ -27,12 +22,12 @@ fun prettyPrintParseError(
         column = lines.last().length
     }
 
-    val sb = StringBuilder("Syntax error at line $lineNumber, column $column:".redBold() + " $errorMessage\n".red())
+    val sb = StringBuilder("Syntax error at line $lineNumber, column $column: $errorMessage\n")
 
-    val errorLine = if (lineNumber <= lines.size) lines[lineNumber - 1].blue() else ""
+    val errorLine = if (lineNumber <= lines.size) lines[lineNumber - 1] else ""
     sb.appendLine(errorLine)
 
-    val squiggly = " ".repeat(column) + "^" + "~".repeat(minOf(3, errorLine.length - column)).yellow()
+    val squiggly = " ".repeat(column) + "^" + "~".repeat(minOf(3, errorLine.length - column))
     sb.append(squiggly)
     return sb.toString()
 }

@@ -14,6 +14,15 @@ class Parser(
 ) {
     private val tokenizer = Tokenizer(sourceCode)
 
+    companion object {
+        fun parseExpressionFromString(expressionStr: String): Expression? {
+            val parser = Parser(expressionStr)
+            val tokenizer = parser.tokenizer
+            tokenizer.position = 0 // Reset position
+            return parser.parseExpression()
+        }
+    }
+
     fun parse(): List<Statement> {
         val statements = mutableListOf<Statement>()
 

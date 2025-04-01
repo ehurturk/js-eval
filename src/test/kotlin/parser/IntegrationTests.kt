@@ -23,24 +23,16 @@ class IntegrationTests {
         val program = parser.parse()
 
         assertNotNull(program)
-        assertTrue(program is Statement.Declaration)
+        assertTrue(program[0] is Statement.Declaration)
 
-        var currentStmt: Statement? = program
-        val statements = mutableListOf<Statement>()
-
-        while (currentStmt != null) {
-            statements.add(currentStmt)
-            currentStmt = currentStmt.next
-        }
-
-        assertEquals(5, statements.size)
+        assertEquals(5, program.size)
 
         // First statement: let a = 10
-        assertTrue(statements[0] is Statement.Declaration)
-        assertEquals("a", (statements[0] as Statement.Declaration).name)
+        assertTrue(program[0] is Statement.Declaration)
+        assertEquals("a", (program[0] as Statement.Declaration).variable.name)
 
         // Last statement: sum / product
-        assertTrue(statements[4] is Statement.ExpressionStmt)
-        assertTrue((statements[4] as Statement.ExpressionStmt).expr is Expression.Div)
+        assertTrue(program[4] is Statement.ExpressionStmt)
+        assertTrue((program[4] as Statement.ExpressionStmt).expr is Expression.Div)
     }
 }

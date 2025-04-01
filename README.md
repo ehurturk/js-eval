@@ -4,7 +4,7 @@ An evaluator of a stripped down version of JS, aiming to replicate REPL of Node.
 ## Supports:
 - Declarations
 - Function Declarations
-  - functions defined like:
+  - Pure functions defined like:
   - ```js
     function double(x) {
       return x * 2;
@@ -13,7 +13,7 @@ An evaluator of a stripped down version of JS, aiming to replicate REPL of Node.
 - Expressions
   - Arithmetic operations of +, -, *, /
   - Assignment
-  - Function expressions
+  - Function call expressions
   - Variable References
   - Literals (values)
 
@@ -27,6 +27,9 @@ For an initial program with:
 /* 3 */ let c = 3;
 /* 4 */ let d = a + b;
 /* 5 */ c + d
+/* 6 */ function double(x) {
+/* 7 */    return 2 * x;
+/* 8 */ }
 ```
 These requests can be executed:
 ```
@@ -36,6 +39,8 @@ These requests can be executed:
 <<< ok
 >>> evalLine 5
 <<< 7
+>>> invoke double 20
+<<< 40
 ```
  
 ## Tests:
@@ -52,16 +57,10 @@ You can use the following commands in the interactive session:
   - assigns a variable to a value (NOTE: the variable should be declared first)
   - `varvalue` can also be an expression (e.g. `assign a c+4`)
 - `evalLine [lineno]`: evaluates the given line number and returns the result if it is an expression
-- `[funcname]([args])`: invokes a function with the given arguments
+- `invoke [funcname] [args separated by comma]`: invokes a function with the given arguments and returns the result
 
 ## TODO
-- Implement`invokeFunction()` in program
-- Function declaration implementation
-  ```js
-  function double(x) {
-      return 2*x;
-  }
-  ```
+- Implement ``reload`` in program  -> move parser inside program
 - Anonymous function expression (as arrow functions) implementation
   ```js
     const b = (c,d) => { ... }

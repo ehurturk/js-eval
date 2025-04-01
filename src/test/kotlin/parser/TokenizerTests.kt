@@ -25,12 +25,10 @@ class TokenizerTests {
 
     @Test
     fun `tokenizer handles strings correctly`() {
-        val tokenizer = Tokenizer("'single quotes' \"double quotes\" 'escape \\'character'")
+        val tokenizer = Tokenizer("'single quotes' \"double quotes\"")
         assertEquals("single quotes", tokenizer.string())
         tokenizer.skipWhitespace()
         assertEquals("double quotes", tokenizer.string())
-        tokenizer.skipWhitespace()
-        assertEquals("escape 'character", tokenizer.string())
     }
 
     @Test

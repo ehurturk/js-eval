@@ -33,6 +33,7 @@ package interpreter
  *                 [FUNC_BODY]
  *           }
  *         - const [FUNC_NAME] = ([FUNC_ARGS]) => [FUNC_BODY];
+ *
  */
 
 sealed interface Statement {

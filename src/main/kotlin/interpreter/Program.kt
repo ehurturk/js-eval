@@ -1,7 +1,6 @@
 package interpreter
 
-import interactive.red
-import interactive.yellow
+import parser.Parser
 
 sealed interface Request {
     data class EvalLine(
@@ -78,7 +77,7 @@ class Program(
 
     private fun evalLine(lineNumber: Int): Value {
         if (lineNumber < 1 || lineNumber > stmts.size) {
-            return Value.StringValue("Line number is out of range.".red())
+            return Value.StringValue("Line number is out of range.")
         }
         // TODO: Execute actual line numbers instead of statement elements
         val stmt = stmts[lineNumber - 1]
@@ -94,10 +93,18 @@ class Program(
         return Value.StringValue("ok")
     }
 
-    fun invokeFunction(
+    private fun invokeFunction(
         funcName: String,
         args: List<String>,
-    ): Value = Value.IntValue(4)
+    ): Value {
+        val parsedArgs =
+            args.map { argString ->
+                Parser.parseExpressionFromString(argString)
+                    ?: throw IllegalArgumentException("Failed to parse argument: $argString")
+            }
+
+        return Expression.FunctionCall(funcName, parsedArgs).eval(env)
+    }
 
     // For interactive requests
     fun executeRequest(req: Request): Value =
@@ -116,8 +123,7 @@ class Program(
             Request.PrintInfo -> Value.StringValue(toString())
             Request.PrintHelp ->
                 Value.StringValue(
-                    "Commands:\n\tevalLine [lineno]: Evaluates the statement at line number\n\tassign [varname] [varvalue]: Assigns the value to the variable name\n\tinfo: Displays current information about variables\n\thelp: Displays a help message"
-                        .yellow(),
+                    "Commands:\n\tevalLine [lineno]: Evaluates the statement at line number\n\tassign [varname] [varvalue]: Assigns the value to the variable name\n\tinfo: Displays current information about variables\n\thelp: Displays a help message",
                 )
         }
 

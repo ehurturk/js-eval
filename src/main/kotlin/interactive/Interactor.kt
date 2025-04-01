@@ -7,6 +7,13 @@ import parser.ParserException
 class Interactor(
     private val program: Program,
 ) {
+    fun processCommand(input: String): String {
+        val request = parseCommand(input) ?: return "Invalid command"
+
+        val result = program.executeRequest(request)
+        return result.toString()
+    }
+
     fun startInteractiveSession() {
         while (true) {
             print(">>> ")
@@ -14,13 +21,13 @@ class Interactor(
             try {
                 val request = parseCommand(input)
                 if (request == null) {
-                    println("Invalid command".redBold())
+                    println("Invalid command")
                     continue
                 }
                 val result = executeCommand(request)
                 println("<<< $result")
             } catch (e: Exception) {
-                println("<<< ${"Error:".redBold()} ${e.message?.red() ?: e.toString().red()}")
+                println("<<< ${"Error:"} ${e.message ?: e.toString()}")
             }
         }
     }
