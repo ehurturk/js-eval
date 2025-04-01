@@ -65,7 +65,32 @@ fun Expression.eval(env: Environment): Value =
         is Expression.Literal -> value
 
         // Function related evals
-        is Expression.FunctionCall -> TODO()
+        is Expression.FunctionCall -> {
+            val func = env.getFunction(name)
+            if (args.size !=
+                func.args.size
+            ) {
+                throw UndefinedBehaviourException(
+                    "${args.size} arguments passed to function $name that requires ${func.args.size} arguments",
+                )
+            }
+
+            val innerEnv = Environment()
+            args.forEachIndexed { index, expression ->
+                val argval = expression.eval(env)
+                innerEnv.declareVariable(func.args[index], Expression.Literal(argval), VariableModifier.MUTABLE)
+            }
+
+            try {
+                for (stmt in func.body) {
+                    stmt.step(innerEnv)
+                }
+                // TODO: Change the void return value from -999 to an Undefined value.
+                Value.IntValue(-999)
+            } catch (returned: ReturnValueE) {
+                returned.value ?: Value.IntValue(-999)
+            }
+        }
         is Expression.FuncExpr -> TODO()
 
         //  Operation related evals

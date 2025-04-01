@@ -9,16 +9,15 @@ import parser.ParserException
 fun main(args: Array<String>) {
     val source =
         """
-        let a = 1;
-        const b = 2;
-        let c = a + b;
-        let d = c + a;
-        function test(a, b, c) {
-            let d = 12;
-            return 12;
-            let c = 13;
+        function double(x) {
+          return x * 2;
         }
-        c + d;
+
+        const one = 1; 
+        let x = one + 2;
+        let y = double(4);
+
+        x + y
         """.trimIndent()
 
     val parser = Parser(source)

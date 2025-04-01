@@ -70,6 +70,9 @@ fun Statement.step(env: Environment): Value {
             return Value.StringValue("Declared function ${function.name}")
         }
 
-        is Statement.ReturnStmt -> TODO()
+        is Statement.ReturnStmt -> {
+            val returnVal = value?.eval(env)
+            throw ReturnValueE(returnVal)
+        }
     }
 }

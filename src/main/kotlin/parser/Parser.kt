@@ -79,8 +79,6 @@ class Parser(
             )
         }
 
-        // If not a declaration, it must be an expression statement
-        // TODO: Add function support
         val expr = parseExpression() ?: return null
         tokenizer.match(";")
 
@@ -146,12 +144,14 @@ class Parser(
 
     private fun parseFunctionBody(): List<Statement> {
         val statements = mutableListOf<Statement>()
+        var foundReturnStmt = false // for now, I will be setting a flag for determining if a return statement exists
 
         while (tokenizer.hasMore()) {
             tokenizer.skipWhitespace()
 
             // check return statement
             if (tokenizer.match("return")) {
+                foundReturnStmt = true
                 tokenizer.skipWhitespace()
                 val expression = parseExpression()
                 statements.add(Statement.ReturnStmt(expression))
@@ -161,6 +161,7 @@ class Parser(
             }
 
             if (tokenizer.peek() == '}') {
+                if (!foundReturnStmt) throw ParserException("Expected a return statement in function body", sourceCode, tokenizer.position)
                 break
             }
 
@@ -288,6 +289,38 @@ class Parser(
         }
     }
 
+    private fun parseFunctionCall(functionName: String): Expression.FunctionCall =
+        Expression.FunctionCall(functionName, parseArgumentList())
+
+    // TODO: find ways to combine parseArgumentList with parseParameterList
+    private fun parseArgumentList(): List<Expression> {
+        val arguments = mutableListOf<Expression>()
+
+        tokenizer.skipWhitespace()
+
+        if (tokenizer.peek() == ')') {
+            return arguments
+        }
+
+        while (true) {
+            tokenizer.skipWhitespace()
+
+            val argument =
+                parseExpression()
+                    ?: throw ParserException("Expected expression as function argument", sourceCode, tokenizer.position)
+
+            arguments.add(argument)
+
+            tokenizer.skipWhitespace()
+
+            if (!tokenizer.match(",")) {
+                break
+            }
+        }
+
+        return arguments
+    }
+
     private fun parsePrimary(): Expression? {
         tokenizer.skipWhitespace()
 
@@ -312,6 +345,12 @@ class Parser(
         // Variable reference
         val identifier = tokenizer.identifier()
         if (identifier != null) {
+            if (tokenizer.match("(")) {
+                // we are calling a function
+                val fcExpr = parseFunctionCall(identifier)
+                if (!tokenizer.match(")")) throw ParserException("Function call ')' should be closed", sourceCode, tokenizer.position)
+                return fcExpr
+            }
             return Expression.VariableReference(identifier)
         }
 
