@@ -1,6 +1,7 @@
 # Evaluator
 An evaluator of a stripped down version of JS, aiming to replicate REPL of Node.js.
-
+## Example Usage
+![usage](./assets/gui.png) 
 ## Supports:
 - Declarations
 - Function Declarations
@@ -19,30 +20,6 @@ An evaluator of a stripped down version of JS, aiming to replicate REPL of Node.
 
 
 
-## Example Usage
-For an initial program with:
-```js
-/* 1 */ let a = 1;
-/* 2 */ let b = 2;
-/* 3 */ let c = 3;
-/* 4 */ let d = a + b;
-/* 5 */ c + d
-/* 6 */ function double(x) {
-/* 7 */    return 2 * x;
-/* 8 */ }
-```
-These requests can be executed:
-```
->>> evalLine 5
-<<< 6
->>> assign a 2
-<<< ok
->>> evalLine 5
-<<< 7
->>> invoke double 20
-<<< 40
-```
- 
 ## Tests:
 Tests are contained in `src/test/` directory. The tests are:
 - `EvalTests.kt` 
