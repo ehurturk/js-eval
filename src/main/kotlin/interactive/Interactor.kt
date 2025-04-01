@@ -1,6 +1,9 @@
 package interactive
 
-import interpreter.*
+import interpreter.Program
+import interpreter.Request
+import interpreter.Statement
+import interpreter.Value
 import parser.Parser
 import parser.ParserException
 

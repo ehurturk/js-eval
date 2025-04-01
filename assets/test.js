@@ -1,8 +1,4 @@
-let a = 1;
-let b = 2;
-let c = 3;
-let d = a + b;
-c + d
-function double(x) {
-    return 2 * x
-}
+const a = false;
+let b = false;
+const c = true > false;
+let d = 10 + a && !b;

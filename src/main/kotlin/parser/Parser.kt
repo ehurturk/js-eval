@@ -14,11 +14,12 @@ class Parser(
 ) {
     private val tokenizer = Tokenizer(sourceCode)
 
+    // todo: if there is time left get rid of this nonsense
     companion object {
         fun parseExpressionFromString(expressionStr: String): Expression? {
             val parser = Parser(expressionStr)
             val tokenizer = parser.tokenizer
-            tokenizer.position = 0 // Reset position
+            tokenizer.position = 0
             return parser.parseExpression()
         }
     }
@@ -53,7 +54,13 @@ class Parser(
             val initializer = parseExpression() ?: return null
             tokenizer.match(";")
 
-            if (initializer is Expression.Assignment) throw ParserException("Expected expression after '='", sourceCode, tokenizer.position)
+            if (initializer is Expression.Assignment) {
+                throw ParserException(
+                    "Expected expression after '='",
+                    sourceCode,
+                    tokenizer.position,
+                )
+            }
 
             return Statement.Declaration(
                 Symbol.Variable(
@@ -222,7 +229,7 @@ class Parser(
             }
             tokenizer.position = namePos
         }
-        val rest = parseAdditive()
+        val rest = parseLogical()
         tokenizer.skipWhitespace()
         if (tokenizer.peek() == '=') {
             tokenizer.match("=") // consume it
@@ -231,9 +238,79 @@ class Parser(
         return rest
     }
 
-    private fun parseFuncExpr(): Expression? {
-        // TODO: Parse it actually
-        return parseAdditive()
+    private fun parseLogical(): Expression? {
+        var left = parseComparison() ?: return null
+
+        while (true) {
+            tokenizer.skipWhitespace()
+            when {
+                tokenizer.match("&&") -> {
+                    tokenizer.skipWhitespace()
+                    val right =
+                        parseMultiplicative() ?: throw ParserException(
+                            "Expected expression after &&",
+                            sourceCode,
+                            tokenizer.position,
+                        )
+                    left = Expression.BAnd(left, right)
+                }
+                tokenizer.match("||") -> {
+                    tokenizer.skipWhitespace()
+                    val right =
+                        parseMultiplicative() ?: throw ParserException(
+                            "Expected expression after ||",
+                            sourceCode,
+                            tokenizer.position,
+                        )
+                    left = Expression.BOr(left, right)
+                }
+
+                else -> return left
+            }
+        }
+    }
+
+    private fun parseComparison(): Expression? {
+        var left = parseAdditive() ?: return null
+
+        while (true) {
+            tokenizer.skipWhitespace()
+            when {
+                tokenizer.match(">") -> {
+                    tokenizer.skipWhitespace()
+                    val right =
+                        parseMultiplicative() ?: throw ParserException(
+                            "Expected expression after >",
+                            sourceCode,
+                            tokenizer.position,
+                        )
+                    left = Expression.GreaterThan(left, right)
+                }
+                tokenizer.match("<") -> {
+                    tokenizer.skipWhitespace()
+                    val right =
+                        parseMultiplicative() ?: throw ParserException(
+                            "Expected expression after <",
+                            sourceCode,
+                            tokenizer.position,
+                        )
+                    left = Expression.LessThan(left, right)
+                }
+
+                tokenizer.match("==") -> {
+                    tokenizer.skipWhitespace()
+                    val right =
+                        parseMultiplicative() ?: throw ParserException(
+                            "Expected expression after ==",
+                            sourceCode,
+                            tokenizer.position,
+                        )
+                    left = Expression.Equals(left, right)
+                }
+
+                else -> return left
+            }
+        }
     }
 
     private fun parseAdditive(): Expression? {
@@ -268,7 +345,7 @@ class Parser(
     }
 
     private fun parseMultiplicative(): Expression? {
-        var left = parsePrimary() ?: return null
+        var left = parseNot() ?: return null
 
         while (true) {
             tokenizer.skipWhitespace()
@@ -296,6 +373,15 @@ class Parser(
                 else -> return left
             }
         }
+    }
+
+    private fun parseNot(): Expression? {
+        if (tokenizer.match("!")) {
+            val expr = parsePrimary() ?: throw ParserException("Expected a variable identifier after !", sourceCode, tokenizer.position)
+            return Expression.BNeg(expr)
+        }
+
+        return parsePrimary()
     }
 
     private fun parseFunctionCall(functionName: String): Expression.FunctionCall =

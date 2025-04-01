@@ -71,8 +71,15 @@ class Program(
             is Expression.Sub -> "${formatExpression(expr.lhs)} - ${formatExpression(expr.rhs)}"
             is Expression.Mul -> "${formatExpression(expr.lhs)} * ${formatExpression(expr.rhs)}"
             is Expression.Div -> "${formatExpression(expr.lhs)} / ${formatExpression(expr.rhs)}"
-            is Expression.FuncExpr -> "function(${expr.args.joinToString(", ")}) { /* ... */ }"
             is Expression.FunctionCall -> "${expr.name}(${expr.args.joinToString(", ")}})"
+            is Expression.BAnd -> "${formatExpression(expr.lhs)} && ${formatExpression(expr.rhs)}"
+            is Expression.BNeg -> "!${formatExpression(expr.lhs)}"
+            is Expression.BOr -> "${formatExpression(expr.lhs)} || ${formatExpression(expr.rhs)}"
+            is Expression.Equals -> "${formatExpression(expr.lhs)} == ${formatExpression(expr.rhs)}"
+            is Expression.GreaterThan -> "${formatExpression(expr.lhs)} > ${formatExpression(expr.rhs)}"
+            is Expression.GreaterThanOrEquals -> "${formatExpression(expr.lhs)} >= ${formatExpression(expr.rhs)}"
+            is Expression.LessThan -> "${formatExpression(expr.lhs)} < ${formatExpression(expr.rhs)}"
+            is Expression.LessThanOrEquals -> "${formatExpression(expr.lhs)} <= ${formatExpression(expr.rhs)}"
         }
 
     private fun evalLine(lineNumber: Int): Value {

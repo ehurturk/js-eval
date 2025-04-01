@@ -3,16 +3,20 @@ An evaluator of a stripped down version of JS, aiming to replicate REPL of Node.
 ## Example Usage
 ![usage](./assets/gui.png) 
 ## Supports:
-- Declarations
-- Function Declarations
-  - Pure functions defined like:
-  - ```js
-    function double(x) {
-      return x * 2;
-    }
-    ```
+- Statements:
+  - Variable Declarations
+  - Function Declarations
+    - Pure functions defined like:
+    - ```js
+      function double(x) {
+        return x * 2;
+      }
+      ```
+  - Loops/Conditional Statements are **yet** to be implemented.
 - Expressions
   - Arithmetic operations of +, -, *, /
+  - Comparison operations of >, <, ==, >=, <=
+  - Logical operations of &&, ||, !
   - Assignment
   - Function call expressions
   - Variable References
@@ -37,11 +41,7 @@ You can use the following commands in the interactive session:
 - `invoke [funcname] [args separated by comma]`: invokes a function with the given arguments and returns the result
 
 ## TODO
-- Implement ``reload`` in program  -> move parser inside program
-- Anonymous function expression (as arrow functions) implementation
-  ```js
-    const b = (c,d) => { ... }
-    ```
+- conditional / loop statement support
 - Implement support for ES named imports:
   ```js
     import { foo, bar } from "/modules/my-module.js";

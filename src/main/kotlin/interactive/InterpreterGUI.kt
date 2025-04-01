@@ -17,12 +17,6 @@ import parser.Parser
 import parser.ParserException
 import java.io.File
 
-class REPLInterpreter {
-    fun start(args: Array<String>) {
-        Application.launch(InterpreterGUI::class.java, *args)
-    }
-}
-
 class InterpreterGUI : Application() {
     private var program: Program? = null
     private var interactor: Interactor? = null
@@ -162,21 +156,24 @@ class InterpreterGUI : Application() {
             val inputStream = File(path).inputStream()
             val src = inputStream.bufferedReader().use { it.readText() }
 
+            var parsedCorrectly = true
             val parser = Parser(src)
             val parsed: List<Statement> =
                 try {
                     parser.parse()
                 } catch (e: ParserException) {
                     appendConsoleOutput("Parser error: ${e.message}")
-                    return
+                    appendConsoleOutput("No file loaded.")
+                    parsedCorrectly = false
+                    emptyList()
                 }
-
+            println(parsed)
             program = Program(parsed)
             interactor = Interactor(program!!)
 
             try {
                 program!!.execute()
-                appendConsoleOutput("Loaded and executed file: $path")
+                if (parsedCorrectly) appendConsoleOutput("Loaded and executed file: $path")
             } catch (e: Exception) {
                 appendConsoleOutput("Execution error: ${e.message}")
             }
@@ -208,6 +205,6 @@ class InterpreterGUI : Application() {
 
     private fun appendConsoleOutput(text: String) {
         consoleOutput.appendText("$text\n")
-        consoleOutput.scrollTop = Double.MAX_VALUE // Scroll to bottom
+        consoleOutput.scrollTop = Double.MAX_VALUE
     }
 }

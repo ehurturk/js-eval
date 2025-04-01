@@ -27,10 +27,6 @@ sealed interface Expression {
         val args: List<Expression>,
     ) : Expression
 
-    data class FuncExpr(
-        val args: List<String>,
-    ) : Expression
-
     data class Add(
         val lhs: Expression,
         val rhs: Expression,
@@ -47,6 +43,45 @@ sealed interface Expression {
     ) : Expression
 
     data class Div(
+        val lhs: Expression,
+        val rhs: Expression,
+    ) : Expression
+
+    data class BAnd(
+        val lhs: Expression,
+        val rhs: Expression,
+    ) : Expression
+
+    data class BOr(
+        val lhs: Expression,
+        val rhs: Expression,
+    ) : Expression
+
+    data class BNeg(
+        val lhs: Expression,
+    ) : Expression
+
+    data class GreaterThan(
+        val lhs: Expression,
+        val rhs: Expression,
+    ) : Expression
+
+    data class LessThan(
+        val lhs: Expression,
+        val rhs: Expression,
+    ) : Expression
+
+    data class GreaterThanOrEquals(
+        val lhs: Expression,
+        val rhs: Expression,
+    ) : Expression
+
+    data class LessThanOrEquals(
+        val lhs: Expression,
+        val rhs: Expression,
+    ) : Expression
+
+    data class Equals(
         val lhs: Expression,
         val rhs: Expression,
     ) : Expression
@@ -91,11 +126,17 @@ fun Expression.eval(env: Environment): Value =
                 returned.value ?: Value.IntValue(-999)
             }
         }
-        is Expression.FuncExpr -> TODO()
-
         //  Operation related evals
         is Expression.Add -> lhs.eval(env).add(rhs.eval(env))
         is Expression.Div -> lhs.eval(env).div(rhs.eval(env))
         is Expression.Mul -> lhs.eval(env).mul(rhs.eval(env))
         is Expression.Sub -> lhs.eval(env).sub(rhs.eval(env))
+        is Expression.BAnd -> lhs.eval(env).and(rhs.eval(env))
+        is Expression.BNeg -> lhs.eval(env).neg()
+        is Expression.BOr -> lhs.eval(env).or(rhs.eval(env))
+        is Expression.Equals -> lhs.eval(env).eq(rhs.eval(env))
+        is Expression.GreaterThan -> lhs.eval(env).gt(rhs.eval(env))
+        is Expression.LessThan -> lhs.eval(env).lt(rhs.eval(env))
+        is Expression.GreaterThanOrEquals -> lhs.eval(env).gte(rhs.eval(env))
+        is Expression.LessThanOrEquals -> lhs.eval(env).lte(rhs.eval(env))
     }
