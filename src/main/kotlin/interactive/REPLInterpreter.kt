@@ -9,7 +9,7 @@ class REPLInterpreter(
         if (gui) {
             Application.launch(InterpreterGUI::class.java, *args)
         } else {
-            // TODO: CmdLine filename
+            println("CMD mode is not yet supported! Please run with the gui option instead.")
         }
     }
 }

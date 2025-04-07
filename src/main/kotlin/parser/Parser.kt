@@ -13,8 +13,8 @@ class Parser(
     private val sourceCode: String,
 ) {
     private val tokenizer = Tokenizer(sourceCode)
+    val lineToStatementMap = mutableMapOf<Int, Statement>()
 
-    // todo: if there is time left get rid of this nonsense
     companion object {
         fun parseExpressionFromString(expressionStr: String): Expression? {
             val parser = Parser(expressionStr)
@@ -28,11 +28,17 @@ class Parser(
         val statements = mutableListOf<Statement>()
 
         while (tokenizer.hasMore()) {
+            tokenizer.skipWhitespace()
+
+            // calculate the linenumber for evalLine
+            val currentLineNumber = 1 + sourceCode.substring(0, tokenizer.position).count { it == '\n' }
+
             val statement = parseStatement() ?: break
             statements.add(statement)
+
+            lineToStatementMap[currentLineNumber] = statement
         }
 
-        if (statements.isEmpty()) return emptyList()
         return statements
     }
 
@@ -387,7 +393,6 @@ class Parser(
     private fun parseFunctionCall(functionName: String): Expression.FunctionCall =
         Expression.FunctionCall(functionName, parseArgumentList())
 
-    // TODO: find ways to combine parseArgumentList with parseParameterList
     private fun parseArgumentList(): List<Expression> {
         val arguments = mutableListOf<Expression>()
 

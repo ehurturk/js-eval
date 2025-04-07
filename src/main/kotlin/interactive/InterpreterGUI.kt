@@ -167,8 +167,7 @@ class InterpreterGUI : Application() {
                     parsedCorrectly = false
                     emptyList()
                 }
-            println(parsed)
-            program = Program(parsed)
+            program = Program(parsed, parser.lineToStatementMap)
             interactor = Interactor(program!!)
 
             try {

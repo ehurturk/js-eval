@@ -1,5 +1,21 @@
 import interactive.REPLInterpreter
 
-private const val USE_GUI = true
+// usage: jseval [-gui] [-help]
+fun main(args: Array<String>) {
+    if (args.size != 1) {
+        println("Usage: jseval [-gui | -help]")
+        return
+    }
+    val argsMap = args.toList()
+    val useGui = argsMap.contains("-gui")
+    val printHelp = argsMap.contains("-help")
 
-fun main(args: Array<String>) = REPLInterpreter(gui = USE_GUI).start(args)
+    if (printHelp) {
+        println("Usage: jseval [-gui | -help]")
+        println("\t-gui: Enables GUI mode for jseval")
+        println("\t-help: Displays this message")
+        return
+    }
+
+    REPLInterpreter(gui = useGui).start(args)
+}

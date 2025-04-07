@@ -24,7 +24,10 @@ sealed interface Request {
 
 class Program(
     private val stmts: List<Statement>,
+    private val lineStatementMap: Map<Int, Statement>,
 ) {
+    constructor(stmt: List<Statement>) : this(stmt, emptyMap())
+
     val env = Environment()
 
     // For executing the file
@@ -83,10 +86,21 @@ class Program(
         }
 
     private fun evalLine(lineNumber: Int): Value {
+        if (lineNumber < 0) return Value.StringValue("Invalid line number: $lineNumber")
+        if (lineStatementMap.isNotEmpty()) {
+            val stmt = lineStatementMap[lineNumber]
+            if (stmt != null) {
+                return stmt.step(env)
+            }
+            if (lineNumber <= lineStatementMap.keys.max()) {
+                return Value.StringValue("Line number $lineNumber does not contain any statement.")
+            }
+            return Value.StringValue("Line number $lineNumber not found in source.")
+        }
+
         if (lineNumber < 1 || lineNumber > stmts.size) {
             return Value.StringValue("Line number is out of range.")
         }
-        // TODO: Execute actual line numbers instead of statement elements
         val stmt = stmts[lineNumber - 1]
         return stmt.step(env)
     }
