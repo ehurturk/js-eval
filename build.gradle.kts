@@ -15,6 +15,16 @@ javafx {
     modules = arrayOf("javafx.controls").toMutableList()
 }
 
+tasks.jar.configure {
+    manifest {
+        attributes(mapOf("Main-Class" to "MainKt"))
+    }
+    configurations["compileClasspath"].forEach { file: File ->
+        from(zipTree(file.absoluteFile))
+    }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
 dependencies {
     testImplementation(kotlin("test"))
 }
