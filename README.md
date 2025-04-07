@@ -1,5 +1,9 @@
 # Evaluator
 An evaluator of a stripped down version of JS, aiming to replicate REPL of Node.js.
+## Installation
+You can run this project in 2 ways:
+1. Install the `.jar` from the releases section, and then run `java -jar jseval-v1.0.jar [-gui | -help]`
+2. Clone the repo and open the project in IntelliJ. Then simply run the `Main.kt` file located in `src/main/kotlin/Main.kt`.
 ## Example Usage
 ![usage](./assets/gui.png) 
 ## Supports:
